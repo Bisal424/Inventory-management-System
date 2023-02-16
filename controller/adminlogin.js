@@ -1,6 +1,6 @@
 require('dotenv').config();
 //const JWT_SECRET = process.env.JWT_SECRET;
-const adminLogin = async(req,res)=>{
+const adminLogin = async(req,res )=>{
     try {
         const {email,password}=req.body;
         if(!email || !password ){
