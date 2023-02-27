@@ -10,6 +10,7 @@ const addsaleHistory= async(req,res)=>{
             throw new Error ("Please fill in all this fields");
         }
         const SalesHistory = await salesHistory.create({
+            store_id:req.params.id,
             productId,
             item_name,
             category,
@@ -27,15 +28,19 @@ const addsaleHistory= async(req,res)=>{
     }
 }
 
-//Route-2 <--------------------- Getsaleshistory ------------------------------------------->//
+
+//Route-2 <--------------------- Getsaleshistory(By store id) ------------------------------->//
 const getsalesHistory = async(req,res)=>{
-        try {
-            const Gethistory = await salesHistory.find();
-            res.status(200).json(Gethistory);
-        }    catch(error) {
-            res.status(400).send({ error:error.message, message:'Something went wrong!', status: 'fail'});
-        }
+    try {
+    await salesHistory.findById(req.params.id)
+    .populate("store_id").select('-_id').select('-__v')
+    .then(data=>{
+        res.json(data);
+    })
+    } catch (error) {
+        return res.status(500).send({ error: 'Server error' });
     }
+}
 
 //Route-3 <-------------------- Update sales history  --------------------------------------->//
 const upadatesalesHistory = async(req,res)=>

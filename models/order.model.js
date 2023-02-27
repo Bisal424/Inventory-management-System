@@ -2,6 +2,11 @@ const mongoose   = require('mongoose');
 const { Schema } = mongoose;
 
 const salesHistorySchema = new Schema({ // TODO: Order Status ['Pending', 'Fulfilled/Completed', 'Cancelled']
+    store_id:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Store',
+    required:true
+    },
     productId: {
     type: String,
     required: [true, "Please add a product_id"],

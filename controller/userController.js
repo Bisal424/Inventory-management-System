@@ -6,6 +6,9 @@ const sendMail              = require('../utils/nodemailer');
 
 require('dotenv').config();
 const JWT_SECRET = process.env.JWT_SECRET;
+const REFRESH_TOKEN_SECRET= process.env.REFRESH_TOKEN_SECRET;
+
+let RefreshTokens = [];
 
 
 //ROUTE:1 <-----------------------  Register a user (By Admin)  -------------------------->//
@@ -30,7 +33,8 @@ try {
                     email    : req.body.email,
                     name     : req.body.name,
                     role     : req.body.role,
-                    password : secPassword
+                    password : secPassword,
+                    
                 });
         sendMail(req.body.name, req.body.email , password ,'create');
         return res.status(200).send({Message : "mail sent sucessfully!"})
@@ -80,6 +84,7 @@ const updatePassword = async (req,res)=>{
 
 //ROUTE-3 <--------------------------- login User(Staff) -------------------------------------->//
 
+
 const loginUser = async (req, res) =>
 {
     //if there are errors return bad request and the errors.
@@ -98,9 +103,11 @@ const loginUser = async (req, res) =>
         {
         id: User._id
         }
-    }
-        const authtoken = jwt.sign(data, JWT_SECRET);
-        res.json({ authtoken });
+    }   
+        const accesstoken = jwt.sign(data, JWT_SECRET,{expiresIn:'15m'});
+        const refreshtoken = jwt.sign(data,REFRESH_TOKEN_SECRET);
+        RefreshTokens.push(refreshtoken);
+        res.json({ accesstoken:accesstoken,refreshtoken:refreshtoken });
     }
     catch (err) {
         console.log(err.message);
@@ -108,14 +115,37 @@ const loginUser = async (req, res) =>
     }
 }
 
-
+//<-------------------- (Refresh-token) ------------------------------->//
+const refreshToken = async(req,res)=>{
+    const refreshToken = req.body.token;
+    if(refreshToken == null)
+    {
+        return res.status(401)
+    }
+    if(!RefreshTokens.includes(refreshToken))
+    {
+        return res.sendStatus(403);
+    }
+    jwt.verify(refreshToken,REFRESH_TOKEN_SECRET,async(err,payload)=>{
+        if(err){
+            return res.sendStatus(403);
+        }
+        payload = {
+            user: 
+            {
+            id: user._id
+            }
+        }
+        const accesstoken = jwt.sign(payload, JWT_SECRET,{expiresIn:'15m'});
+        const refreshtoken = jwt.sign(payload,REFRESH_TOKEN_SECRET,{expiresIn:'15d'});
+        return res.json({accesstoken,refreshtoken});
+    })
+}
 //ROUTE-4 <--------------------- Get user Detailes(Owner) ----------------------------------------->//
 
 const getUser= async(req, res) =>
 {
     try {
-    //const userid= ;
-    console.log(req.user.id);
     const User = await user.findById(req.user.id).select("-password");
     res.send(User);
     }
@@ -130,7 +160,6 @@ const forgetPassword = async(req,res)=>{
         try {
             const filter        = { email : req.body.email }
             const dbResponse    = await user.findOne(filter)
-            //console.log("------->",dbResponse);
             if(!dbResponse){
                 return res.status(400).json({Message:"Record Not found!",status:"success"});
             }
@@ -141,9 +170,7 @@ const forgetPassword = async(req,res)=>{
                 password:password,
                 accountStatus:false
             }
-            //console.log("------->",newData);
             const response  = await user.updateOne({ email: req.body.email }, newData);
-            console.log("------->",response);
             if(response){
                 sendMail( dbResponse.name, dbResponse.email, ranPassword, 'reset')
                 return res.status(200).send({ message : 'An email has been sent to your email id!', status: 'success' });
@@ -176,5 +203,6 @@ module.exports = {
     loginUser , 
     getUser,
     forgetPassword,
-    removeUser
+    removeUser,
+    refreshToken
 };

@@ -37,11 +37,7 @@ const productSchema = new Schema(
         image: {                    
         type: String,
         default: {},
-    },  //Foriegn Key
-        category:{ 
-        type:  mongoose.Schema.Types.ObjectId,
-        ref: 'Category'
-}
+    },
 },
 {
     timestamps: true,

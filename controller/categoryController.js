@@ -1,18 +1,24 @@
 const category = require('../models/category.model');
+const product  = require('../models/product.model');
 
 
 //Route-1  <--------------------  (Add category)  ------------------------------------->//
 const addCategory = async(req,res)=>{
     try {
         const { category_name } = req.body;
+        const Product = await product.findById(req.params.id);
+        if (!Product) {
+            return res.status(400).send({ error: 'Invalid product ID' });
+        }
         if(!category_name){
             res.status(400).send("Please add a category");
         }
         const Category = await category.create({
-            category_name
+            category_name,
+            product_id:req.params.id
         })
         if(Category){
-            res.status(200).json({Message:"category created Sucessfully",Status:true,payload:Category});
+            res.status(200).json({Message:"category created Sucessfully",Status:true,payload:{Category,Product}});
         }else{
             res.status(400).send("Error in category creation");
         }
@@ -21,17 +27,16 @@ const addCategory = async(req,res)=>{
     }
 }
 
-//Route-2  <------------------ (Get all category) ------------------------------------->//
+//Route-2  <------------------ (Get a category) ------------------------------------->//
 const getCategory = async(req,res)=>{
     try {
-        const data = await category.find();
-        if(!data){
-            return res.status(400).send("Error in fetching Category Data");
-        }else{
-            return res.status(200).json({payload:data});
-        }
+        await category.findById(req.params.id)
+        .populate("product_id")
+        .then(data=>{
+            res.json(data);
+        })
     } catch (error) {
-        return res.status(500).send("Internal server Error");  
+        return res.status(500).send({ error: 'Server error' });
     }
 }
 

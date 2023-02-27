@@ -1,13 +1,10 @@
 const product                 = require('../models/product.model');
-const fs                      = require('fs');
 
-
-
-//(Route-1)<-----------create a product (Add product)------------->//
+//(Route-1)<----------- create a product (Add product) ------------->//
 
 const createProduct = async (req,res)=>{
     try {
-    
+    // const Category = await category.findById(req.params.id);
     const { item_name,item_id,brand,quantity,price,description } = req.body;
     //validation
     if( !item_name ||!brand ||!quantity || !price ||!description ){
@@ -21,10 +18,10 @@ const createProduct = async (req,res)=>{
     quantity,
     price,
     description,
-    image:req.file.path
+    image:req.file.path,
     });
     if(Product){
-    res.status(200).send("Product created Sucessfully");
+    return res.status(200).json({Message:"Product created Sucessfully",payload:{Product}});
     }else
     {
     log.error(message)
@@ -48,7 +45,7 @@ const getallProduct = async(req,res)=>{
     }
 }
 
-//Route-3 <--------------Get single product ------------------------->//
+//Route-3 <-------------- Get single product ------------------------->//
 
 const getProduct = async(req,res)=>{
     try {
@@ -63,7 +60,7 @@ const getProduct = async(req,res)=>{
     }
 }
 
-//Route-4 <---------------Delete a Product ---------------------------->//
+//Route-4 <--------------- Delete a Product ---------------------------->//
 
 const deleteProduct = async(req,res)=>{
     try {

@@ -20,13 +20,23 @@ const userSchema = new Schema({
     },
     role:{
         type:String,
-        enum:['OWNER','STAFF'],
+        enum:['Admin', 'STORE_MANAGER', 'REGIONAL MANAGER', 'STAFF'],
         required : true 
     },
     accountStatus:{
         type :Boolean,
         default :false
     },
+    
+    // tokens:
+    // { 
+    //     type : Array
+    // }
+    // assignedTo:{
+    //     type:'store',
+    //     storeId:"",
+    //     regionId:''
+    // }
 },
 {
     timestamps: true

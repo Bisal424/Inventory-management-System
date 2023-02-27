@@ -1,5 +1,6 @@
-PDFDocument = require('pdfkit');
+PDFDocument   = require('pdfkit');
 const request = require('request');
+
 
 //     function buildPDF(dataCallback,endCallback){
 //     const doc = new PDFDocument();
@@ -22,11 +23,12 @@ function buildPDF(dataCallback,endCallback){
   doc.on('data',dataCallback);
   doc.on('end',endCallback);
   doc.font('Helvetica-Bold');
-  doc.fillColor('#007bff');
+  //doc.fillColor('#007bff');
   doc.underline(0, 25, doc.page.width, 0);
   doc.fontSize(12).text(`Data from the API: ${JSON.stringify(data)}`);
   doc.end();
 }
 )}
+
 
 module.exports = { buildPDF };

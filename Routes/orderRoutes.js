@@ -7,14 +7,15 @@ const   {
         deleteSalesHistoryByDate
         }                                  = require('../controller/orderController');
 
+const fetchuser  =require('../middleware/fetchusermiddleware');
 const pdfService =require('../services/pdf-service');
 
 
-router.post('/addhistory',addsaleHistory);
-router.get('/gethistory',getsalesHistory);
+router.post('/addhistory/:id',fetchuser,addsaleHistory);
+router.get('/gethistory/:id',fetchuser,getsalesHistory);
 
-router.put('/updatehistory/:id',upadatesalesHistory);
-router.delete('/deletesaleshistory',deleteSalesHistoryByDate);
+router.put('/updatehistory/:id',fetchuser,upadatesalesHistory);
+router.delete('/deletesaleshistory',fetchuser,deleteSalesHistoryByDate);
 
 router.get('/invoice',(req,res)=>{
         const stream = res.writeHead(200,{

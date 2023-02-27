@@ -1,6 +1,6 @@
 require('dotenv').config();
 //const JWT_SECRET = process.env.JWT_SECRET;
-const adminLogin = async(req,res )=>{
+const adminLogin = async(req,res)=>{
     try {
         const {email,password}=req.body;
         if(!email || !password ){
@@ -8,8 +8,10 @@ const adminLogin = async(req,res )=>{
             throw new Error("Please fill in all required fields");
         }
         if(process.env.EMAIL == email && process.env.PASSWORD == password){
-                res.status(200).json({message : "Success",payload:authtoken});
-            }
+            return res.status(200).send({Status:true,Message:"Admin Verified"});
+        }else{
+            return res.status(200).send({Status:false,Message:"Admin Not Verified"});
+        }
     }
     catch (error) {
         return res.status(500).send("Internal Server Error");
