@@ -17,29 +17,31 @@ const userSchema = new Schema({
     },
     password:{
         type:String,
+        required:[true,"please enter a password"],
+        minLength:[6,"Please enter minimum 6 digit length"]
     },
     role:{
-        type:String,
-        enum:['Admin', 'STORE_MANAGER', 'REGIONAL MANAGER', 'STAFF'],
-        required : true 
+        type:  mongoose.Schema.Types.ObjectId,
+        ref: 'Role',
+        //required: true
+    },
+    isAdmin:{
+        type:Boolean,
+        default:false
     },
     accountStatus:{
         type :Boolean,
         default :false
     },
-    
-    // tokens:
-    // { 
-    //     type : Array
-    // }
-    // assignedTo:{
-    //     type:'store',
-    //     storeId:"",
-    //     regionId:''
-    // }
 },
 {
     timestamps: true
 });
 
 module.exports = mongoose.model('User',userSchema);
+
+    // role:{
+    //     type:String,
+    //     enum:['ADMIN', 'STORE_MANAGER', 'REGIONAL_MANAGER', 'STAFF'],
+    //     required : true 
+    // },

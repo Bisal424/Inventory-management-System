@@ -7,24 +7,26 @@ const   {
         updatePassword,
         forgetPassword,
         removeUser,
-        refreshToken
+        refreshToken,
+        createAdmin
         }                   = require('../controller/userController');
 
 const   fetchUser           = require('../middleware/fetchusermiddleware');
-const   adminLogin          = require('../controller/adminlogin');
+const   {adminGuard}        = require('../middleware/perms');
 
 //These 3 Routes For Admin-panel(Owner)
 
-router.post('/adminlogin',adminLogin);
+
+router.post('/createadmin',createAdmin);
+
+router.post('/register/:id',adminGuard, registerUser);
+router.delete('/removeuser',adminGuard, removeUser);
+router.get('/getuser',adminGuard,getUser);
 
 router.post('/refresh',refreshToken);
 
-router.post('/register', registerUser);
-router.delete('/removeuser', removeUser);
-router.get('/getuser',fetchUser,getUser);
-
 //These 3 Routes For user-panel(Staff)
-router.post('/login',loginUser);
+router.post('/login/:id',loginUser);
 router.put('/updatepassword',updatePassword);
 router.post('/forgetpassword',fetchUser,forgetPassword);
 

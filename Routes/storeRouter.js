@@ -9,11 +9,12 @@ const   {
         getallStores,
         updateStore
         }                   = require('../controller/storeController');
+const { regionGaurd,adminGuard,storeGuard } = require('../middleware/perms');
 
-Router.post('/addstore/:id',fetchuser,addStore);
-Router.get('/fetchStore/:id',fetchuser,fetchStore);
-Router.delete('/deleteStore/:id',fetchuser,deleteStore);
-Router.get('/fetchallstores',fetchuser,getallStores);
-Router.put('/updatestore/:id',fetchuser,updateStore);
+Router.post('/addstore/:id',fetchuser,regionGaurd,adminGuard,storeGuard,addStore);
+Router.get('/fetchStore/:id',fetchuser,regionGaurd,adminGuard,storeGuard,fetchStore);
+Router.delete('/deleteStore/:id',fetchuser,regionGaurd,adminGuard,storeGuard,deleteStore);
+Router.get('/fetchallstores',fetchuser,regionGaurd,adminGuard,storeGuard,getallStores);
+Router.put('/updatestore/:id',fetchuser,regionGaurd,adminGuard,storeGuard,updateStore);
 
 module.exports = Router;

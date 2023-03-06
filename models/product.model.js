@@ -2,7 +2,12 @@ const mongoose    = require("mongoose");
 const { Schema }  = mongoose;
 
 const productSchema = new Schema(
-    {
+    {       
+        store_id:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Store',
+        required:true
+        },
         item_name: {
         type: String,
         required: [true, "Please add a item_name"],

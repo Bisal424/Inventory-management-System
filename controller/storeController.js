@@ -9,7 +9,11 @@ const addStore = async(req, res) =>{
     if (!Region) {
         return res.status(400).send({ error: 'Invalid region ID' });
     }
-    const Store = await store.create({ store_name,regionid : req.params.id ,category_id});
+    const Store = await store.create({
+        store_name,//query parameter
+        regionid : req.params.id ,
+        category_id
+    });
     if(Store)
     {   
         return res.status(200).json({status:true,Message:"Store Data deleted Sucessfully",payload : { store_name,Region,category_id,}});

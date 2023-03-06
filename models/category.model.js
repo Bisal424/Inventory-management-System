@@ -7,9 +7,9 @@ const categorySchema = new Schema({
         required:[true,"Please add a category_name"]
     },
     product_id:{ 
-    type:  mongoose.Schema.Types.ObjectId,
-    ref: 'Product',
-    required: true
+        type:  mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+        required: true
     },
 });
 

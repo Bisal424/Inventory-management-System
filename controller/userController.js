@@ -11,13 +11,32 @@ const REFRESH_TOKEN_SECRET= process.env.REFRESH_TOKEN_SECRET;
 let RefreshTokens = [];
 
 
+const createAdmin = async(req,res)=>{
+    const {email,password,isAdmin} = req.body;
+    let User = await user.findOne({ email: req.body.email });
+    if (User) {
+    return res.status(400).json({ error: "sorry one user is already exits with this user" });
+    }
+    if(!email || !password){
+        return res.status(201).send("Please fill all the required field");
+    }
+    const Data = user.create({
+        email,
+        password,
+        isAdmin
+    })
+    if(Data)
+        return res.status(200).json({message:"User created successfully!"});
+}
+
 //ROUTE:1 <-----------------------  Register a user (By Admin)  -------------------------->//
 const registerUser = async (req, res) =>
 {
 try {
-        const { name, email,role } = req.body;
+        const { name, email} = req.body;
+        const role= req.params.id;
         // Validation
-                if (!name || !email ||!role ) {
+                if (!name || !email ) {
                 res.status(400);
                 throw new Error("Please fill in all required fields");
         }
@@ -32,16 +51,15 @@ try {
                 ({
                     email    : req.body.email,
                     name     : req.body.name,
-                    role     : req.body.role,
-                    password : secPassword,
-                    
+                    role,
+                    password : secPassword
                 });
         sendMail(req.body.name, req.body.email , password ,'create');
         return res.status(200).send({Message : "mail sent sucessfully!"})
     }
         catch (error) {
         console.log(error.message);
-        res.status(500).send("Internal sever error");
+        return res.status(500).send("Internal sever error");
     }
 }
 
@@ -65,9 +83,7 @@ const updatePassword = async (req,res)=>{
         
         const salt = await bcrypt.genSalt(10);
         const genpassword = await bcrypt.hash(newPass,salt);
-        const dbResponse = await user.findByIdAndUpdate(doc._id,{password : genpassword,
-        accountStatus: true});
-
+        const dbResponse = await user.findByIdAndUpdate(doc._id,{password : genpassword,accountStatus: true});
         if(dbResponse)
         {
             return res.status(201).send({ message : 'record updated successfully!', status: 'success' });
@@ -90,6 +106,9 @@ const loginUser = async (req, res) =>
     //if there are errors return bad request and the errors.
     const { email, password } = req.body;
     try {
+        const Data =await user.findById(req.params.id)
+        .populate('role')
+        //.populate('isAdmin');
         let User = await user.findOne({ email });
         if (!User) {
             return res.status(400).json({ error: "please try to login with correct credentials" });
@@ -101,13 +120,16 @@ const loginUser = async (req, res) =>
         const data = {
         user: 
         {
-        id: User._id
+        id: User._id,
+        role: Data.role.role_name//changed(User.role)
+        //isAdmin:Data.isAdmin//changed
         }
     }   
+        console.log(data);
         const accesstoken = jwt.sign(data, JWT_SECRET,{expiresIn:'15m'});
         const refreshtoken = jwt.sign(data,REFRESH_TOKEN_SECRET);
         RefreshTokens.push(refreshtoken);
-        res.json({ accesstoken:accesstoken,refreshtoken:refreshtoken });
+        res.json({ accesstoken:accesstoken,refreshtoken:refreshtoken});
     }
     catch (err) {
         console.log(err.message);
@@ -143,17 +165,20 @@ const refreshToken = async(req,res)=>{
 }
 //ROUTE-4 <--------------------- Get user Detailes(Owner) ----------------------------------------->//
 
-const getUser= async(req, res) =>
-{
+const getUser = async (req, res) => {
     try {
-    const User = await user.findById(req.user.id).select("-password");
-    res.send(User);
+      // Check if the user is authorized
+    if (req.user.role !== 'ADMIN') {
+        return res.status(403).json({ msg: 'Not authorized' });
     }
-    catch (error) {
-    console.log(error.message);
-    res.status(500).send("Internal sever error");
+     // Get all users from the database
+    const users = await user.find().select('-password');
+        return res.json(users);
+    } catch (err) {
+        console.error(err.message);
+        res.status(500).send('Internal Server Error');
     }
-}
+};
 
 //Route-5 <---------------------------- forget Password (Staff) -------------------------------------->//
 const forgetPassword = async(req,res)=>{
@@ -184,6 +209,9 @@ const forgetPassword = async(req,res)=>{
 
 const removeUser = async(req,res)=>{
     try {
+        if (req.user.role !== 'ADMIN') {
+            return res.status(403).json({ msg: 'Not authorized' });
+        }
         const data = req.body.email;
         const response = await user.remove({email:data});
         if(response){
@@ -204,5 +232,6 @@ module.exports = {
     getUser,
     forgetPassword,
     removeUser,
-    refreshToken
+    refreshToken,
+    createAdmin
 };

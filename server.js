@@ -3,6 +3,7 @@ const cors               = require('cors');
 const bodyParser         = require('body-parser');
 const Dbconnection       = require('./services/Db');
 
+
 const app                = express();
 
 const userRoute          = require('./Routes/userRoute');
@@ -12,6 +13,7 @@ const categoryRoute      = require('./Routes/categoryRoutes');
 const regionRoute        = require('./Routes/regionRoutes');
 const storeRoute         = require('./Routes/storeRouter');
 const inventoryRoute     = require('./Routes/inventoryRouter');
+const roleRoute          = require('./Routes/roleRouter');
 
 const morgan             = require('morgan');
 
@@ -35,6 +37,7 @@ app.use('/api/v4',categoryRoute);
 app.use('/api/v5',regionRoute);
 app.use('/api/v6',storeRoute);
 app.use('/api/v7',inventoryRoute);
+app.use('/api/v8',roleRoute);
 
 
 app.listen(PORT,()=>{
