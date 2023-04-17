@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 require('Dotenv').config();
-const MONGO_URI = mongodb+srv://<user>:<user>@cluster0.nrmaauw.mongodb.net/Inventory-Management?retryWrites=true&w=majority;
+const MONGO_URI = "mongodb+srv://<user>:<user>@cluster0.nrmaauw.mongodb.net/Inventory-Management?retryWrites=true&w=majority";
 
 mongoose.set('strictQuery', false);
 const connectDB = async () => {
